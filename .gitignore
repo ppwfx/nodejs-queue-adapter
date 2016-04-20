@@ -33,5 +33,8 @@ jspm_packages
 # Optional REPL history
 .node_repl_history
 
-# Mac stuff
+#OSX
 .DS_store
+
+#IDE
+.idea
