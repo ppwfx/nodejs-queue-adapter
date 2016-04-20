@@ -14,7 +14,7 @@ adapter:
     - ACTIVEMQ_PORT=30001
     - ACTIVEMQ_USERNAME=admin
     - ACTIVEMQ_PASSWORD=admin
-    - RABBITMQ_PORT=15672
+    - RABBITMQ_PORT=15673
     - RABBITMQ_HOST=rabbitmq
     - RABBITMQ_USERNAME=user
     - RABBITMQ_PASSWORD=password
@@ -41,4 +41,4 @@ rabbitmq:
     - RABBITMQ_DEFAULT_PASS=password
   ports:
     - "15671:15671"
-    - "15672:15672"
+    - "15673:15672"
