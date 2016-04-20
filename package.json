@@ -27,5 +27,8 @@
     "gulp-tsc": "^0.10.1",
     "gulp-shell": "^0.4.2",
     "run-sequence": "^1.1.1"
+  },
+  "scripts": {
+    "test": "mocha src/tests/**/* -t 10000"
   }
 }
