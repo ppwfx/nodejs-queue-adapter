@@ -6,16 +6,15 @@ adapter:
   links:
     - activemq
     - beanstalkd
-    - kafka
     - rabbitmq
   environment:
-    - BEANSTALKD_PORT=11300
+    - BEANSTALKD_PORT=30002
     - BEANSTALKD_HOST=beanstalkd
     - ACTIVEMQ_HOST=activemq
-    - ACTIVEMQ_PORT=5672
+    - ACTIVEMQ_PORT=30001
     - ACTIVEMQ_USERNAME=admin
     - ACTIVEMQ_PASSWORD=admin
-    - RABBITMQ_PORT=
+    - RABBITMQ_PORT=30003
     - RABBITMQ_HOST=rabbitmq
     - RABBITMQ_USERNAME=user
     - RABBITMQ_PASSWORD=password
@@ -30,11 +29,11 @@ activemq:
     - "8161:8161"
     - "61616:61616"
     - "61613:61613"
-    - "5672:5672"
+    - "30001:5672"
 beanstalkd:
   image: schickling/beanstalkd
   ports:
-    - "11300:11300"
+    - "30002:11300"
 rabbitmq:
   image: rabbitmq
   environment:
@@ -42,4 +41,4 @@ rabbitmq:
     - RABBITMQ_DEFAULT_PASS=password
   ports:
     - "15671:15671"
-    - "15672:15672"
+    - "30003:15672"
