@@ -9,4 +9,4 @@ before_install:
   - cd docker && docker-compose up -d
 
 script:
-  - docker exec docker_adapter_1 npm install && npm test
+  - docker exec docker_adapter_1 sh -c 'npm install && npm test'
