@@ -1,6 +1,7 @@
 import * as Chai from 'chai';
 import Promise = require('bluebird');
 import RabbitMqAdapter = require('../helper/TestableRabbitMqAdapter');
+import {RabbitMqQueueConfig} from "../../adapter/rabbitmq/RabbitMqConfig";
 
 describe('RabbitMqAdapter', function () {
     describe('#getContextPromise()', function () {
@@ -38,6 +39,22 @@ describe('RabbitMqAdapter', function () {
     describe('#getPublishConnectionPromise()', function () {
         it('returns a promise', function (done) {
             Chai.assert.instanceOf(RabbitMqAdapter.getPublishConnectionPromise('test'), Promise, 'is Instance of promise');
+
+            done();
+        });
+    });
+
+    describe('#getConnectionString()', function () {
+        it('returns a promise', function (done) {
+            var config:RabbitMqQueueConfig = {
+                defaultConcurrency: 1,
+                port: 'port',
+                host: 'host',
+                username: 'username',
+                password: 'password'
+            };
+
+            Chai.assert.equal(RabbitMqAdapter.getConnectionString(config), 'amqp://username:password@host:port', 'is correct connection string');
 
             done();
         });
