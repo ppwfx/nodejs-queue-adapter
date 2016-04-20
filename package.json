@@ -1,0 +1,31 @@
+{
+  "name": "queue-adapter",
+  "version": "0.0.1",
+  "private": true,
+  "description": "",
+  "keywords": [],
+  "author": "",
+  "license": "",
+  "main": "adapter.js",
+  "dependencies": {
+    "amqp": "^0.2.4",
+    "amqp-coffee": "^0.1.27",
+    "amqp10": "^3.0.0",
+    "async": "^1.5.2",
+    "aws-sdk": "^2.3.3",
+    "bluebird": "^3.3.4",
+    "chai": "^3.5.0",
+    "fivebeans": "^1.3.1",
+    "jerbil": "^1.2.0",
+    "lodash": "^4.6.1",
+    "no-kafka": "^2.2.1",
+    "wascally": "^0.2.10"
+  },
+  "devDependencies": {
+    "require-dir": "^0.3.0",
+    "gulp": "^3.6.2",
+    "gulp-tsc": "^0.10.1",
+    "gulp-shell": "^0.4.2",
+    "run-sequence": "^1.1.1"
+  }
+}

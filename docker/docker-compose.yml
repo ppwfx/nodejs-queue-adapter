@@ -1,0 +1,45 @@
+adapter:
+  build: .
+  environment: []
+  volumes:
+    - ./..:/opt/adapter
+  links:
+    - activemq
+    - beanstalkd
+    - kafka
+    - rabbitmq
+  environment:
+    - BEANSTALKD_PORT=11300
+    - BEANSTALKD_HOST=beanstalkd
+    - ACTIVEMQ_HOST=activemq
+    - ACTIVEMQ_PORT=5672
+    - ACTIVEMQ_USERNAME=admin
+    - ACTIVEMQ_PASSWORD=admin
+    - RABBITMQ_PORT=
+    - RABBITMQ_HOST=rabbitmq
+    - RABBITMQ_USERNAME=user
+    - RABBITMQ_PASSWORD=password
+    - SQS_ACCESSKEYID=
+    - SQS_SECRETACCESSKEY=
+    - SQS_REGION=
+activemq:
+  image: webcenter/activemq
+  environment:
+    - ACTIVEMQ_MAX_MEMORY=512
+  ports:
+    - "8161:8161"
+    - "61616:61616"
+    - "61613:61613"
+    - "5672:5672"
+beanstalkd:
+  image: schickling/beanstalkd
+  ports:
+    - "11300:11300"
+rabbitmq:
+  image: rabbitmq
+  environment:
+    - RABBITMQ_DEFAULT_USER=user
+    - RABBITMQ_DEFAULT_PASS=password
+  ports:
+    - "15671:15671"
+    - "15672:15672"
