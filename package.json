@@ -1,12 +1,23 @@
 {
   "name": "queue-adapter",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "private": true,
   "description": "",
   "keywords": [],
-  "author": "",
-  "license": "",
-  "main": "adapter.js",
+  "author": {
+    "name": "Philipp Wördehoff",
+    "email": "ph.woerdehoff@gmail.com",
+    "url": "21st.io"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/21stio/nodejs-collection-adapter"
+  },
+  "license": {
+    "type": "MIT",
+    "url": "http://www.opensource.org/licenses/mit-license.php"
+  },
+  "main": "index.js",
   "dependencies": {
     "amqp10": "^3.0.0",
     "async": "^1.5.2",
@@ -23,10 +34,11 @@
     "gulp-tsc": "^0.10.1",
     "gulp-shell": "^0.4.2",
     "run-sequence": "^1.1.1",
+    "istanbul": "^0.4.3",
     "depcheck": "^0.6.3",
     "mocha": "^2.4.5"
   },
   "scripts": {
-    "test": "mocha src/tests/**/* -t 10000"
+    "test": "./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha -- src/tests/**/* -t 10000"
   }
 }
