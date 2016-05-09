@@ -38,7 +38,7 @@ Object.keys(adapters).forEach(function(key){
 });
 
 function test_concurrency(adapterName: string, adapter: QueueAdapter, concurrency: number, testNo: number, done: () => void) {
-    let noMessages = 3;
+    let noMessages = 6;
     let consumeCount = 0;
     let produceCount = 0;
     let currentConcurrency = 0;
