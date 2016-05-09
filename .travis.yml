@@ -1,12 +1,22 @@
-sudo: required
-
 language: node_js
-
+node_js:
+  - "5"
+  - "5.1"
+  - "4"
+  - "4.2"
+  - "4.1"
+  - "4.0"
+  - "0.12"
+  - "0.11"
+  - "0.10"
+  - "iojs"
 services:
-  - docker
-
+- rabbitmq
+- docker
 before_install:
-  - cd docker && docker-compose up -d
-
-script:
-  - docker exec docker_adapter_1 sh -c 'npm install && npm test'
+  - docker-compose up -d -f ./docker/docker-compose-travis-ci.yml
+env:
+  - BEANSTALKD_HOST=localhost BEANSTALKD_PORT=11300 ACTIVEMQ_HOST=localhost ACTIVEMQ_PORT=30001 ACTIVEMQ_USERNAME=admin ACTIVEMQ_PASSWORD=admin RABBITMQ_HOST=localhost RABBITMQ_PORT=5672 RABBITMQ_USERNAME=guest RABBITMQ_PASSWORD=guest
+after_success:
+  - npm install codeclimate-test-reporter
+  - codeclimate-test-reporter < coverage/lcov.info
