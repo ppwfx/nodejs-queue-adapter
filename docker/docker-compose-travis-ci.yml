@@ -1,0 +1,13 @@
+activemq:
+  image: webcenter/activemq
+  environment:
+    - ACTIVEMQ_MAX_MEMORY=512
+  ports:
+    - "8161:8161"
+    - "61616:61616"
+    - "61613:61613"
+    - "30001:5672"
+beanstalkd:
+  image: schickling/beanstalkd
+  ports:
+    - "11300:11300"
