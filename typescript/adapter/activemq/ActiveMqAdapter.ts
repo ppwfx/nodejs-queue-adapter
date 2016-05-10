@@ -2,23 +2,23 @@ import {IEncoder} from "../../encoder/IEncoder";
 import {ActiveMqConfig} from "./ActiveMqConfig";
 import Promise = require('bluebird');
 import Amqp10 = require('amqp10');
-import {Job} from "../Job";
+import {IJob} from "../abstract/IJob";
 import {ActiveMqJob} from "./ActiveMqJob";
-import {QueueAdapter} from "../QueueAdapter";
+import {QueueAdapter} from "../abstract/QueueAdapter";
 import {IErrorHandler} from "../../handler/error/IErrorHandler";
 
-export class ActiveMqAdapter extends QueueAdapter{
+export class ActiveMqAdapter extends QueueAdapter {
 
     protected config:ActiveMqConfig;
     protected clientPromises:{[concurrency: number]: Promise} = {};
     protected receiverPromises:{[queueName: string]: Promise} = {};
     protected senderPromises:{[queueName: string]: Promise} = {};
 
-    constructor(errorHandler:IErrorHandler, encoder:IEncoder, config:ActiveMqConfig, consumeConcurrencies:{}) {
-        super(errorHandler, encoder, config, consumeConcurrencies);
+    constructor(errorHandler:IErrorHandler, encoder:IEncoder, config:ActiveMqConfig = new ActiveMqConfig()) {
+        super(errorHandler, encoder, config);
     }
 
-    public consume(queueName:string, callback:(job:Job) => void) {
+    public consume(queueName:string, callback:(job:IJob) => void) {
         var self = this;
 
         self.getReceiverPromise(queueName).then(function (receiver) {
@@ -38,7 +38,7 @@ export class ActiveMqAdapter extends QueueAdapter{
         })
     }
 
-    protected getClientPromiseYo(concurrency: number) {
+    protected getClientPromise(concurrency:number) {
         var self = this;
 
         if (!self.clientPromises[concurrency]) {
@@ -57,10 +57,10 @@ export class ActiveMqAdapter extends QueueAdapter{
 
     protected getSenderPromise(queueName:string):Promise {
         var self = this;
-        var concurrency = self.getConcurrency(queueName);
+        var concurrency = self.config.getConcurrency(queueName);
 
         if (!self.senderPromises[queueName]) {
-            self.senderPromises[queueName] = self.getClientPromiseYo(concurrency).then(function (client) {
+            self.senderPromises[queueName] = self.getClientPromise(concurrency).then(function (client) {
                 return client.createSender(queueName);
             })
         }
@@ -70,10 +70,10 @@ export class ActiveMqAdapter extends QueueAdapter{
 
     protected getReceiverPromise(queueName:string):Promise {
         var self = this;
-        var concurrency = self.getConcurrency(queueName);
+        var concurrency = self.config.getConcurrency(queueName);
 
         if (!self.receiverPromises[queueName]) {
-            self.receiverPromises[queueName] = self.getClientPromiseYo(concurrency).then(function (client) {
+            self.receiverPromises[queueName] = self.getClientPromise(concurrency).then(function (client) {
                 return client.createReceiver(queueName);
             })
         }

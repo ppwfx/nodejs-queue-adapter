@@ -3,8 +3,9 @@ import Promise = require('bluebird');
 import {RabbitMqQueueConfig} from "./RabbitMqConfig";
 import {IEncoder} from "../../encoder/IEncoder";
 import {RabbitMqJob} from "./RabbitMqJob";
-import {Job} from "../Job";
-import {QueueAdapter} from "../QueueAdapter";
+import {QueueAdapter} from "../abstract/QueueAdapter";
+import {IErrorHandler} from "../../handler/error/IErrorHandler";
+import {IJob} from "../abstract/IJob";
 
 export class RabbitMqAdapter extends QueueAdapter {
 
@@ -18,15 +19,20 @@ export class RabbitMqAdapter extends QueueAdapter {
     protected publishSocketPromise: Promise;
     protected publishConnectionPromises: {[queueName: string]: Promise} = {};
 
+
+    constructor(errorHandler:IErrorHandler, encoder:IEncoder, config:RabbitMqQueueConfig = new RabbitMqQueueConfig()) {
+        super(errorHandler, encoder, config);
+    }
+
     public produce(queueName: string, payload: any) {
         var self = this;
 
-        self.getPublishConnectionPromise(queueName).then(function (publishSocket:Rabbitjs.PushSocket) {
-            publishSocket.write(self.encoder.encode(payload), 'utf8');
+        return self.getPublishConnectionPromise(queueName).then(function (publishSocket:Rabbitjs.PushSocket) {
+            return publishSocket.write(self.encoder.encode(payload), 'utf8');
         });
     }
 
-    public consume(queueName: string, callback: (job: Job) => void) {
+    public consume(queueName: string, callback: (job: IJob) => void) {
         var self = this;
 
         return self.getSubscribeConnectionPromise(queueName).then(function (subscribeSocket:Rabbitjs.WorkerSocket) {

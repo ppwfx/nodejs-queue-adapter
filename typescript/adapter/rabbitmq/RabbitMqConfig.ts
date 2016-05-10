@@ -1,9 +1,9 @@
-import {IConfig} from "../IConfig";
-import {Config} from "../Config";
+import {IConfig} from "../abstract/IConfig";
+import {Config} from "../abstract/Config";
 
 export class RabbitMqQueueConfig extends Config {
-    port:string;
-    host:string;
-    username:string;
-    password:string;
+    host:string = 'localhost';
+    port:number = 5762;
+    username:string = null;
+    password:string = null;
 }

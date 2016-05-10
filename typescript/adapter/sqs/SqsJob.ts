@@ -1,44 +1,53 @@
-import {Job} from "../Job";
 import AWS = require('aws-sdk');
 import {IErrorHandler} from "../../handler/error/IErrorHandler";
+import {AJob} from "../abstract/AJob";
 
-export class SqsJob extends Job {
-    private queueUrl: string;
-    private client: AWS.SQS;
-    private message: AWS.SQS.Message;
-    private asyncQueueCallback: () => void;
+export class SqsJob extends AJob {
+    private queueUrl:string;
+    private client:AWS.SQS;
+    private message:AWS.SQS.Message;
+    private asyncQueueCallback:() => void;
 
-    constructor(errorHandler: IErrorHandler, payload:any, queueUrl: string, client:AWS.SQS, message:AWS.SQS.Message) {
+    constructor(errorHandler:IErrorHandler, payload:any, queueUrl:string, client:AWS.SQS, message:AWS.SQS.Message) {
         super(errorHandler, payload);
         this.queueUrl = queueUrl;
         this.client = client;
         this.message = message;
     }
 
-    public addAsyncQueueCallback(asyncQueueCallback: ()=>void) {
+    public addAsyncQueueCallback(asyncQueueCallback:()=>void) {
         this.asyncQueueCallback = asyncQueueCallback;
     }
 
-    public delete():void {
+    public delete():Promise {
         var self = this;
 
-        super.delete();
+        self.deleted = true;
 
         var params = {
             QueueUrl: self.queueUrl,
             ReceiptHandle: self.message.ReceiptHandle
         };
 
-        self.client.deleteMessage(params, function(error: Error, data) {
-            self.asyncQueueCallback();
-            self.errorHandler.handle(error);
+        return new Promise(function (resolve, reject) {
+            self.client.deleteMessage(params, function (error:Error, data) {
+                if (error) {
+                    reject(error);
+                }
+
+                resolve(data);
+            });
         });
     }
 
-    public release():void {
+    public done() {
+        this.asyncQueueCallback();
+    }
+
+    public release():Promise {
         var self = this;
 
-        super.release();
+        self.released = true;
 
         var params = {
             QueueUrl: self.queueUrl,
@@ -46,9 +55,14 @@ export class SqsJob extends Job {
             VisibilityTimeout: 0
         };
 
-        self.client.changeMessageVisibility(params, function(error: Error, data) {
-            self.asyncQueueCallback();
-            self.errorHandler.handle(error)
+        return new Promise(function (resolve, reject) {
+            self.client.changeMessageVisibility(params, function (error:Error, data) {
+                if (error) {
+                    reject(error);
+                }
+
+                resolve(data);
+            });
         });
     }
 }

@@ -11,16 +11,18 @@ adapter:
     - BEANSTALKD_PORT=11300
     - BEANSTALKD_HOST=beanstalkd
     - ACTIVEMQ_HOST=activemq
-    - ACTIVEMQ_PORT=30001
+    - ACTIVEMQ_PORT=5672
     - ACTIVEMQ_USERNAME=admin
     - ACTIVEMQ_PASSWORD=admin
-    - RABBITMQ_PORT=15673
+    - RABBITMQ_PORT=3000
     - RABBITMQ_HOST=rabbitmq
     - RABBITMQ_USERNAME=user
     - RABBITMQ_PASSWORD=password
     - SQS_ACCESSKEYID=
     - SQS_SECRETACCESSKEY=
     - SQS_REGION=
+  ports:
+    - "5858:5858"
 activemq:
   image: webcenter/activemq
   environment:
@@ -29,7 +31,7 @@ activemq:
     - "8161:8161"
     - "61616:61616"
     - "61613:61613"
-    - "30001:5672"
+    - "5672:5672"
 beanstalkd:
   image: schickling/beanstalkd
   ports:
@@ -41,4 +43,4 @@ rabbitmq:
     - RABBITMQ_DEFAULT_PASS=password
   ports:
     - "15671:15671"
-    - "15673:15672"
+    - "3000:5672"

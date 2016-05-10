@@ -1,28 +1,14 @@
 language: node_js
 node_js:
-  - "5"
-  - "5.1"
-  - "4"
   - "4.2"
-  - "4.1"
-  - "4.0"
-  - "0.12"
-  - "0.11"
-  - "0.10"
-  - "iojs"
 services:
 - rabbitmq
 - docker
 before_install:
-  - docker-compose up -d -f ./docker/docker-compose-travis-ci.yml
+  - docker run -d -p 127.0.0.1:30001:5672 webcenter/activemq
+  - docker run -d -p 127.0.0.1:11300:11300 schickling/beanstalkd
 env:
   - BEANSTALKD_HOST=localhost BEANSTALKD_PORT=11300 ACTIVEMQ_HOST=localhost ACTIVEMQ_PORT=30001 ACTIVEMQ_USERNAME=admin ACTIVEMQ_PASSWORD=admin RABBITMQ_HOST=localhost RABBITMQ_PORT=5672 RABBITMQ_USERNAME=guest RABBITMQ_PASSWORD=guest
 after_success:
   - npm install codeclimate-test-reporter
   - codeclimate-test-reporter < coverage/lcov.info
-deploy:
-  provider: npm
-  email: ph.woerdehoff@gmail.com
-  on:
-    tags: true
-    repo: 21stio/nodejs-queue-adapter
