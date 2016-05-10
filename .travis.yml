@@ -17,4 +17,4 @@ deploy:
   email: ph.woerdehoff@gmail.com
   on:
     tags: true
-    repo: 21stio/nodejs-collection-adapter
+    repo: 21stio/nodejs-queue-adapter
