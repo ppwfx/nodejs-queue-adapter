@@ -8,6 +8,7 @@ before_install:
   - docker run -d -p 127.0.0.1:30001:5672 webcenter/activemq
   - docker run -d -p 127.0.0.1:11300:11300 schickling/beanstalkd
   - echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+  - cat ~/.npmrc
 env:
   - BEANSTALKD_HOST=localhost BEANSTALKD_PORT=11300 ACTIVEMQ_HOST=localhost ACTIVEMQ_PORT=30001 ACTIVEMQ_USERNAME=admin ACTIVEMQ_PASSWORD=admin RABBITMQ_HOST=localhost RABBITMQ_PORT=5672 RABBITMQ_USERNAME=guest RABBITMQ_PASSWORD=guest
 after_success:
