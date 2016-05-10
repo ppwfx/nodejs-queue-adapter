@@ -8,7 +8,6 @@ before_install:
 - docker run -d -p 127.0.0.1:30001:5672 webcenter/activemq
 - docker run -d -p 127.0.0.1:11300:11300 schickling/beanstalkd
 - echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
-- cat ~/.npmrc
 env:
 - BEANSTALKD_HOST=localhost BEANSTALKD_PORT=11300 ACTIVEMQ_HOST=localhost ACTIVEMQ_PORT=30001
   ACTIVEMQ_USERNAME=admin ACTIVEMQ_PASSWORD=admin RABBITMQ_HOST=localhost RABBITMQ_PORT=5672
@@ -23,4 +22,4 @@ deploy:
     tags: true
     repo: 21stio/nodejs-queue-adapter
   api_key:
-    secure: oHGqw5ujM1TtV4wc60zxYuWeaEMMX+CWbLnzlrrNWC/m7wk+iQWRGjKSKWcVvR58Pkq0qX590ZQljnvWFoCUXPgkHvA26Pzp0UNTX1JB81ZY4HcxtImOgrQqG5SD3fwI4/vangua6vvg4OScvkId48YvauFbfu+2xg9sphQR7nDbq3+1g4WciVs6HIEPy84BqTQS7F0Du90cPjOgSbn43r5VSMRAwctG8CBeNirrWd7AeV5AAjBa21EXa1yvXu4+wia3wH3oLTFNV/VCZrwNsjJD7/0JltXu7smpkNcz6G/MyCPValloJLNCTA5LOa7nkiYcaP2RAbqq8iSdlS6GWgVdy9Id/2lHLdceORnRJMzMvUQ1a9ThtIlM3vfVakE6ZwoNBV7FxUBMWoV+Wp4OBLinSjGEsNSkj4PEtL3rUubLqmm8Lo3wI89gQU9RjtN722yZs2BlGELifj/KwNFS5hy1/jBeiGPg4ebDXcYruLujLn57wiPR4hGoYjQuiU6zlA+hmTH+wf7ziSZalqCRzURnFeUCaT66nBGFl7TIhn1mk3Z7ze3rOhQVB3YKpufexYGJ41R89DonD3ofL2IT52ghkpBqT8sU3RbAahKVtCuZJBDS8/4F+z/WHhN+V9WEhBLED6cZ/I/H1SB4Fe6p4kW/TDh9eNmNAtiKXDggCa8=
+    secure: F2EdQbxwsoNq+t/LxHXeWZoEBNrRQA+rQfVi3J4pPVunMi9M2k+fhBDDGKP+inDKUT45sNULx8fYbErcSlXGPvqLaboWfVIsXgVVzDljGyddo8wMTtJUaUcvQ2l/CVxSeBwiIFedRBI+nPMZ5c4Te+LMrsX7MOAPD0Kp6WS4dOVQC6d70K0yc9Aj+CD+sZBuBDjd0JXDqs+GYENj3PBYNlTaVKs/AO7630LtUlT22RBsCI6zgQi8S7T3nRN64uuu3dp+0sMQUSoHYlq9dZUe5qAupvVNAlwdhJ7cHVrEukNJeFLse6AidIiDOA6TbuZQYQPJIDzljbtxVsYX2z8EbPn7hn9aFOAxGlc66KljdL6veipIbK/D3RMdcpZ+S3trrR026xAhQpXT6S6H09EBKJOR0gCQb+NP+xkolzCfkzoU/t1VcYZtlmvknCYfAdt5rXzz2yHP+xCk2AHIdWMqcloCd/kUIJfop89F2ycD00D268DDzlQxMle1Z5SQGpFVut+0wDwHAzFrV+LTBr/bQbAQTDQaUag9a3Oqfxup/xne/fYbHZPcrTUciErDAdGWvN+EwBlg+ZxnbqRoASnI/W5LduUOqMbCN1VNBqJcFYruNMk1knnsACZ6iqvVR5vQJScAfl4q7v+wczQZ73Kloc5aoO9S9KLARR8+SQt6Heo=
