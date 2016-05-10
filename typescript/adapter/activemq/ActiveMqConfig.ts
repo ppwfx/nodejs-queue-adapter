@@ -1,8 +1,8 @@
-import {Config} from "../Config";
+import {Config} from "../abstract/Config";
 
 export class ActiveMqConfig extends Config {
-    port:string;
-    host:string;
+    host:string = 'localhost';
+    port:number = 5672;
     username:string;
     password:string;
 }

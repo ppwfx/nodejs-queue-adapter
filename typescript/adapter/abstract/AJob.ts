@@ -1,11 +1,12 @@
-import {IErrorHandler} from "../handler/error/IErrorHandler";
+import {IErrorHandler} from "../../handler/error/IErrorHandler";
 import {IJob} from "./IJob";
 
-export class Job implements IJob {
+export abstract class AJob implements IJob {
+
     protected errorHandler: IErrorHandler;
     protected payload: any;
-    protected deleted:boolean;
-    protected released:boolean;
+    protected deleted:boolean = false;
+    protected released:boolean = false;
 
     constructor(errorHandler: IErrorHandler, payload: any) {
         this.errorHandler = errorHandler;
@@ -16,19 +17,11 @@ export class Job implements IJob {
         return this.payload;
     }
 
-    public delete():void {
-        this.deleted = true;
-    }
-
     public isDeleted(): boolean {
         return this.deleted;
     }
 
-    public release():void {
-        this.released = true;
-    }
-
-    public isRelease(): boolean {
+    public isReleased(): boolean {
         return this.released;
     }
 }

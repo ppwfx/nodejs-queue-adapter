@@ -9,20 +9,20 @@ import {RabbitMqAdapter} from "./rabbitmq/RabbitMqAdapter";
 
 export class AdapterFactory {
 
-    public create(name:string, config:any, consumeConcurrence?:{[queueName: string]: number} = {},  errorhandler?:IErrorHandler = new StdOutErrorHandler(), encoder?:IEncoder = JsonEncoder) {
+    public create(name:string, config:any, errorhandler?:IErrorHandler = new StdOutErrorHandler(), encoder?:IEncoder = JsonEncoder) {
         var adapter = null;
         switch (name) {
             case 'sqs':
-                adapter = new SqsAdapter(errorhandler, encoder, config, consumeConcurrence);
+                adapter = new SqsAdapter(errorhandler, encoder, config);
                 break;
             case 'beanstalkd':
-                adapter = new BeanstalkdAdapter(errorhandler, encoder, config, consumeConcurrence);
+                adapter = new BeanstalkdAdapter(errorhandler, encoder, config);
                 break;
             case 'activemq':
-                adapter = new ActiveMqAdapter(errorhandler, encoder, config, consumeConcurrence);
+                adapter = new ActiveMqAdapter(errorhandler, encoder, config);
                 break;
             case 'rabbitmq':
-                adapter = new RabbitMqAdapter(errorhandler, encoder, config, consumeConcurrence);
+                adapter = new RabbitMqAdapter(errorhandler, encoder, config);
                 break;
             default:
                 throw new Error(name + ' is not a supported queue adapter')

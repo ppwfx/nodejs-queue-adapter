@@ -1,13 +1,13 @@
-import {ActiveMqConfig} from "../../adapter/activemq/ActiveMqConfig";
-import {ActiveMqAdapter} from "../../adapter/activemq/ActiveMqAdapter";
+import {ActiveMqConfig} from "./../../adapter/activemq/ActiveMqConfig";
 import {JsonEncoder} from "../../encoder/JsonEncoder";
 import {StdOutErrorHandler} from "../../handler/error/StdOutErrorHandler";
-import concurrencyConfig = require('./ConcurrencyConfig');
+import concurrencyConfig = require('./../helper/ConcurrencyConfig');
+import {ActiveMqAdapter} from "../../adapter/activemq/ActiveMqAdapter";
 
 class TestableActiveMqAdapter extends ActiveMqAdapter {
 
-    public getClientPromise():Promise {
-        return super.getClientPromise();
+    public getClientPromise(concurrency: number):Promise {
+        return super.getClientPromise(concurrency);
     }
 
     public getSenderPromise(queueName:string):Promise {
@@ -32,4 +32,6 @@ config.host=process.env.ACTIVEMQ_HOST;
 config.username=process.env.ACTIVEMQ_USERNAME;
 config.password=process.env.ACTIVEMQ_PASSWORD;
 
-export = new TestableActiveMqAdapter(errorHandler, encoder, config, concurrencyConfig);
+config.consumeConcurrencies = concurrencyConfig;
+
+export = new TestableActiveMqAdapter(errorHandler, encoder, config);

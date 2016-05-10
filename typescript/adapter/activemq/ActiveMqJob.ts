@@ -1,9 +1,9 @@
-import {Job} from "../Job";
+import {AJob} from "../abstract/AJob";
 import {IErrorHandler} from "../../handler/error/IErrorHandler";
 
-export class ActiveMqJob extends Job {
-    private receiver: any;
-    private message: any;
+export class ActiveMqJob extends AJob {
+    private receiver:any;
+    private message:any;
 
     constructor(errorHandler:IErrorHandler, payload:any, receiver:any, message:any) {
         super(errorHandler, payload);
@@ -11,15 +11,26 @@ export class ActiveMqJob extends Job {
         this.message = message;
     }
 
-    public delete():void {
-        super.delete();
+    public delete():Promise {
+        var self = this;
 
-        this.receiver.accept(this.message);
+        self.deleted = true;
+
+        return new Promise(function (resolve, reject) {
+            resolve(self.receiver.accept(self.message));
+        });
     }
 
-    public release():void {
-        super.release();
+    public release():Promise {
+        var self = this;
 
-        this.receiver.release(this.message);
+        self.released = true;
+
+        return new Promise(function (resolve, reject) {
+            resolve(self.receiver.reject(self.message));
+        });
+    }
+
+    done():void {
     }
 }

@@ -2,7 +2,7 @@ import {BeanstalkdConfig} from "../../adapter/beanstalkd/BeanstalkdConfig";
 import {BeanstalkdAdapter} from "../../adapter/beanstalkd/BeanstalkdAdapter";
 import {JsonEncoder} from "../../encoder/JsonEncoder";
 import {StdOutErrorHandler} from "../../handler/error/StdOutErrorHandler";
-import concurrencyConfig = require('./ConcurrencyConfig');
+import concurrencyConfig = require('./../helper/ConcurrencyConfig');
 
 class TestableBeanstalkdAdapter extends BeanstalkdAdapter {
 
@@ -18,4 +18,6 @@ var config = new BeanstalkdConfig();
 config.port=process.env.BEANSTALKD_PORT;
 config.host=process.env.BEANSTALKD_HOST;
 
-export = new TestableBeanstalkdAdapter(errorHandler, encoder, config, concurrencyConfig);
+config.consumeConcurrencies = concurrencyConfig;
+
+export = new TestableBeanstalkdAdapter(errorHandler, encoder, config);

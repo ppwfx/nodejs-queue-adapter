@@ -2,7 +2,7 @@ import {RabbitMqQueueConfig} from "../../adapter/rabbitmq/RabbitMqConfig";
 import {RabbitMqAdapter} from "../../adapter/rabbitmq/RabbitMqAdapter";
 import {JsonEncoder} from "../../encoder/JsonEncoder";
 import {StdOutErrorHandler} from "../../handler/error/StdOutErrorHandler";
-import concurrencyConfig = require('./ConcurrencyConfig');
+import concurrencyConfig = require('./../helper/ConcurrencyConfig');
 
 class TestableRabbitMqAdapter extends RabbitMqAdapter {
 
@@ -29,6 +29,7 @@ class TestableRabbitMqAdapter extends RabbitMqAdapter {
     public getConnectionString(config:RabbitMqQueueConfig):string {
         return super.getConnectionString(config);
     }
+
 }
 
 var encoder = new JsonEncoder();
@@ -40,4 +41,8 @@ config.host=process.env.RABBITMQ_HOST;
 config.username=process.env.RABBITMQ_USERNAME;
 config.password=process.env.RABBITMQ_PASSWORD;
 
-export = new TestableRabbitMqAdapter(errorHandler, encoder, config, concurrencyConfig);
+console.log(config);
+
+config.consumeConcurrencies = concurrencyConfig;
+
+export = new TestableRabbitMqAdapter(errorHandler, encoder, config);

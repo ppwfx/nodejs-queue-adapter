@@ -1,30 +1,29 @@
-import {IEncoder} from "../encoder/IEncoder";
-import {IErrorHandler} from "../handler/error/IErrorHandler";
+import {IEncoder} from "../../encoder/IEncoder";
+import {IErrorHandler} from "../../handler/error/IErrorHandler";
 import {IQueueAdapter} from "./IQueueAdapter";
 import {IConfig} from "./IConfig";
 import {IJob} from "./IJob";
+import {OnlyOneConsumerPerQueueError} from "./error/OnlyOneConsumerPerQueueError";
 
 export class QueueAdapter implements IQueueAdapter{
 
     protected errorHandler: IErrorHandler;
     protected encoder: IEncoder;
     protected config: IConfig;
-    protected consumeConcurrencies: {[queueName: string]: number};
     protected consumedQueues: {[queueName: string]: {}};
     protected producedQueues: {[queueName: string]: {}};
 
-    constructor(errorHandler:IErrorHandler, encoder:IEncoder, config:IConfig, consumeConcurrencies:{[queueName: string]: number}) {
+    constructor(errorHandler:IErrorHandler, encoder:IEncoder, config:IConfig) {
         this.errorHandler = errorHandler;
         this.encoder = encoder;
         this.config = config;
-        this.consumeConcurrencies = consumeConcurrencies;
     }
 
     consume(queueName:string, callback:(job:IJob)=>void) {
         var self = this;
 
         if(self.consumedQueues[queueName]) {
-            throw Error();
+            throw OnlyOneConsumerPerQueueError();
         }
 
         self.consumedQueues[queueName] = {};
@@ -38,15 +37,5 @@ export class QueueAdapter implements IQueueAdapter{
         }
 
         self.producedQueues[queueName] = {};
-    }
-
-    protected getConcurrency(queueName: string) {
-        var self = this;
-
-        if(self.consumeConcurrencies && self.consumeConcurrencies[queueName]) {
-            return this.consumeConcurrencies[queueName];
-        }
-
-        return this.config.defaultConcurrency;
     }
 }

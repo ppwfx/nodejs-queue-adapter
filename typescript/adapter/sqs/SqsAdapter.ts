@@ -1,13 +1,13 @@
 import {IEncoder} from "../../encoder/IEncoder";
 import Promise = require('bluebird');
 import AWS = require('aws-sdk');
-import {Job} from "../Job";
 import {SqsConfig} from "./SqsConfig";
 import {IErrorHandler} from "../../handler/error/IErrorHandler";
 import {SqsJob} from "./SqsJob";
-import {QueueAdapter} from "../QueueAdapter";
+import {QueueAdapter} from "../abstract/QueueAdapter";
 import async = require('async');
 import lodash = require('lodash');
+import {IJob} from "../abstract/IJob";
 
 export class SqsAdapter extends QueueAdapter {
 
@@ -15,8 +15,8 @@ export class SqsAdapter extends QueueAdapter {
     protected client:AWS.SQS;
     protected queueUrlPromises:{[queueName: string]: Promise} = {};
 
-    constructor(errorHandler:IErrorHandler, encoder:IEncoder, config:SqsConfig, consumeConcurrencies:{}) {
-        super(errorHandler, encoder, config, consumeConcurrencies);
+    constructor(errorHandler:IErrorHandler, encoder:IEncoder, config:SqsConfig = new SqsConfig()) {
+        super(errorHandler, encoder, config);
     }
 
     public produce(queueName:string, payload:any):Promise {
@@ -25,14 +25,16 @@ export class SqsAdapter extends QueueAdapter {
         return new Promise(function (resolve, reject) {
             self.getSendMessageParamsPromise(queueName, payload).then(function (params:AWS.SQS.SendMessageParams) {
                 self.getClient().sendMessage(params, function (error:Error, result:AWS.SQS.SendMessageResult) {
-                    self.errorHandler.handle(error);
-                    resolve();
+                    if (error) {
+                        reject(error);
+                    }
+                    resolve(result);
                 });
             });
         });
     }
 
-    public consume(queueName:string, callback:(job:Job) => void) {
+    public consume(queueName:string, callback:(job:IJob) => void) {
         var self = this;
 
         self.getReceiveMessageParamsPromise(queueName).then(function (params:AWS.SQS.ReceiveMessageParams) {
@@ -44,12 +46,12 @@ export class SqsAdapter extends QueueAdapter {
 
                 job.addAsyncQueueCallback(yo);
                 callback(job);
-            }, self.getConcurrency(queueName));
+            }, self.config.getConcurrency(queueName));
 
             asyncQueue.empty = function () {
 
                 var interval = setInterval(function () {
-                    if (asyncQueue.length() >= self.getConcurrency(queueName) * 3) {
+                    if (asyncQueue.length() >= self.config.getConcurrency(queueName)) {
                         clearInterval(interval);
 
                         return;
@@ -68,8 +70,7 @@ export class SqsAdapter extends QueueAdapter {
 
                         self.errorHandler.handle(error);
                     });
-                }, self.getPollFrequencyMilliSeconds(queueName));
-
+                }, self.config.getPollFrequencyMilliSeconds(queueName));
             };
 
             asyncQueue.empty();
@@ -90,17 +91,18 @@ export class SqsAdapter extends QueueAdapter {
         var self = this;
 
         if (!self.queueUrlPromises[queueName]) {
-            var params = {
-                QueueName: queueName
-            };
+            var params = self.config.getGetQueueUrlParams(queueName);
 
             self.queueUrlPromises[queueName] = new Promise(function (resolve, reject) {
                 self.getClient().getQueueUrl(params, function (error, result) {
-                    if (error && error.code == 'AWS.SimpleQueueService.NonExistentQueue') {
-                        return self.getCreateQueuePromise(queueName)
+                    if (error) {
+                        if (error.code == 'AWS.SimpleQueueService.NonExistentQueue') {
+                            return self.getCreateQueuePromise(queueName)
+                        } else {
+                            reject(error);
+                        }
                     }
 
-                    self.errorHandler.handle(error);
                     resolve(result.QueueUrl);
                 });
             });
@@ -112,8 +114,10 @@ export class SqsAdapter extends QueueAdapter {
     protected getCreateQueuePromise(queueName:string):Promise {
         var self = this;
         return new Promise(function (resolve, reject) {
-            self.getClient().createQueue(self.getCreateQueueParams(queueName), function (error:Error, result:AWS.SQS.CreateQueueResult) {
-                self.errorHandler.handle(error);
+            self.getClient().createQueue(self.config.getCreateQueueParams(queueName), function (error:Error, result:AWS.SQS.CreateQueueResult) {
+                if (error) {
+                    reject(error);
+                }
                 resolve(result.QueueUrl);
             })
         });
@@ -123,16 +127,7 @@ export class SqsAdapter extends QueueAdapter {
         var self = this;
 
         return self.getQueueUrlPromise(queueName).then(function (queueUrl:string) {
-            var params = self.config.defaultQueueConfig.sendMessageParams;
-
-            if (self.config.queueConfigs[queueName] && self.config.queueConfigs[queueName].sendMessageParams) {
-                params = lodash.assign(params, self.config.queueConfigs[queueName].sendMessageParams);
-            }
-
-            params.QueueUrl = queueUrl;
-            params.MessageBody = self.encoder.encode(payload);
-
-            return params;
+            return self.config.getSendMessageParams(queueName, queueUrl, self.encoder.encode(payload));
         });
     }
 
@@ -140,41 +135,7 @@ export class SqsAdapter extends QueueAdapter {
         var self = this;
 
         return self.getQueueUrlPromise(queueName).then(function (queueUrl:string) {
-            var params = self.config.defaultQueueConfig.receiveMessageParams;
-
-            if (self.config.queueConfigs[queueName] && self.config.queueConfigs[queueName].receiveMessageParams) {
-                params = lodash.assign(params, self.config.queueConfigs[queueName].receiveMessageParams);
-            }
-
-            params.QueueUrl = queueUrl;
-
-            return params;
+            return self.config.getReceiveMessageParams(queueName, queueUrl);
         });
-    }
-
-    protected getCreateQueueParams(queueName:string):AWS.SQS.CreateQueueParams {
-        var self = this;
-
-        var params = self.config.defaultQueueConfig.createQueueParams;
-
-        if (self.config.queueConfigs[queueName] && self.config.queueConfigs[queueName].createQueueParams) {
-            params = lodash.assign(params, self.config.queueConfigs[queueName].createQueueParams);
-        }
-
-        params.QueueName = queueName;
-
-        return params;
-    }
-
-    protected getPollFrequencyMilliSeconds(queueName:string):number {
-        var self = this;
-
-        var pollFrequencyMilliSeconds = self.config.defaultQueueConfig.pollFrequencyMilliSeconds;
-
-        if (self.config.queueConfigs[queueName] && self.config.queueConfigs[queueName].pollFrequencyMilliSeconds) {
-            pollFrequencyMilliSeconds = self.config.queueConfigs[queueName].pollFrequencyMilliSeconds;
-        }
-
-        return pollFrequencyMilliSeconds;
     }
 }

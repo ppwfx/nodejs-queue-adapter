@@ -1,15 +1,20 @@
 import {BeanstalkdConfig} from "./BeanstalkdConfig";
 import Fivebeans = require('fivebeans');
 import Promise = require('bluebird');
-import {Job} from "../Job";
+import {IJob} from "../abstract/IJob";
 import {BeanstalkdJob} from "./BeanstalkdJob";
 import {IEncoder} from "../../encoder/IEncoder";
-import {QueueAdapter} from "../QueueAdapter";
+import {QueueAdapter} from "../abstract/QueueAdapter";
+import {IErrorHandler} from "../../handler/error/IErrorHandler";
 
 export class BeanstalkdAdapter extends QueueAdapter {
 
     protected config:BeanstalkdConfig;
     protected clientPromise:Promise;
+
+    constructor(errorHandler:IErrorHandler, encoder:IEncoder, config:BeanstalkdConfig = new BeanstalkdConfig()) {
+        super(errorHandler, encoder, config);
+    }
 
     protected getClientPromise():Promise {
         var self = this;
@@ -22,7 +27,7 @@ export class BeanstalkdAdapter extends QueueAdapter {
                         resolve(client)
                     })
                     .on('error', function (error) {
-                        self.errorHandler.handle(error);
+                        reject(error)
                     })
                     .on('close', function () {
 
@@ -38,17 +43,23 @@ export class BeanstalkdAdapter extends QueueAdapter {
     public produce(queueName:string, payload:any) {
         var self = this;
 
-        self.getClientPromise().then(function (client) {
-            client.use(queueName, function (err, tubename) {
-                client.put(0, 0, 600, self.encoder.encode(payload), function (error:Error, jobId:number) {
-                    self.errorHandler.handle(error);
+        return new Promise(function (resolve, reject) {
+            self.getClientPromise().then(function (client) {
+                client.use(queueName, function (err, tubename) {
+                    client.put(0, 0, 600, self.encoder.encode(payload), function (error:Error, jobId:number) {
+                        if (error) {
+                            reject(error);
+                        }
+
+                        resolve(jobId);
+                    });
                 });
             });
         });
     }
 
     //todo add local queue
-    public consume(queueName:string, callback:(job:Job) => void) {
+    public consume(queueName:string, callback:(job:IJob) => void) {
         var self = this;
 
         self.getClientPromise().then(function (client) {
@@ -60,7 +71,7 @@ export class BeanstalkdAdapter extends QueueAdapter {
                         var job = new BeanstalkdJob(self.errorHandler, self.encoder.decode(payload.toString('utf8')), client, jobId);
                         callback(job);
                     });
-                }, 300);
+                }, 3000);
             });
         });
     }
