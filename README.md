@@ -1,6 +1,7 @@
 # nodejs-queue-adapter
 
 [![Build Status](https://travis-ci.org/21stio/nodejs-queue-adapter.svg?branch=master)](https://travis-ci.org/21stio/nodejs-queue-adapter)
+[![Test Coverage](https://codeclimate.com/github/21stio/nodejs-queue-adapter/badges/coverage.svg)](https://codeclimate.com/github/21stio/nodejs-queue-adapter/coverage)
 
 Provides a simple interface to a variety of message queues
 
@@ -19,7 +20,7 @@ npm install queue-adapter
 
 ### Usage
 
-More extensive documentation will be added shortly, please have a look at the tests so far
+A more extensive documentation will be added shortly, please have a look at the tests so far
 
 
 Basic Javascript
