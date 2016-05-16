@@ -67,4 +67,5 @@ adapter.consume("my-queue", function(job: IJob){
     job.delete().then(function(){
         jod.done();
     });
+});
 ```
